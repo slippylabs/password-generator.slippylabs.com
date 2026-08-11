@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Generator // password-generator.slippylabs.com</title>
+<meta name="description" content="Cryptographically random passwords with adjustable length and character sets. Runs entirely in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2234%22%20r%3D%2222%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2244%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22%231c8a52%22%20stroke%3D%22%2339ff8f%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E">
+<meta name="theme-color" content="#050b10">
+<link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+
+<div class="starfield"></div>
+<div class="scanlines"></div>
+
+<main class="page-wrap">
+  <div class="hud-panel wide">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="callsign-row">
+      <div class="toad-avatar-wrap">
+        <svg class="toad-avatar" width="46" height="46" viewBox="0 0 64 64">
+          <circle cx="32" cy="34" r="22" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="44" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="3.5" fill="#050b10"/>
+          <circle cx="44" cy="16" r="3.5" fill="#050b10"/>
+          <ellipse cx="24" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <ellipse cx="40" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <circle cx="24" cy="30" r="1.4" fill="#39ff8f"/>
+          <circle cx="40" cy="30" r="1.4" fill="#39ff8f"/>
+          <path d="M22 42 Q32 48 42 42" stroke="#050b10" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="lock-reticle"></div>
+      </div>
+      <span class="callsign">Workshop Division // Tool</span>
+      <div class="nav-links">
+        <a href="https://projects.slippylabs.com/" class="logout-link">← Archive</a>
+      </div>
+    </div>
+
+    <h1>PASSWORD GENERATOR</h1>
+    <p class="subtitle">Uses your browser's cryptographic RNG (<code>crypto.getRandomValues</code>), not a weak <code>Math.random()</code> — the password never leaves this page.</p>
+
+    <div class="password-display">
+      <input type="text" id="pw-output" readonly value="" aria-label="Generated password">
+      <button class="tool-btn" id="copy-btn">Copy</button>
+      <span class="copy-toast" id="copy-toast">Copied!</span>
+    </div>
+
+    <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+    <p class="strength-label" id="strength-label">Strength: —</p>
+
+    <div class="tool-field-row">
+      <label class="tool-field-label" for="length-range">Length: <span id="length-value">16</span></label>
+      <div class="tool-slider-row">
+        <input type="range" id="length-range" min="6" max="64" value="16">
+      </div>
+    </div>
+
+    <div class="tool-checks">
+      <label class="tool-check"><input type="checkbox" id="opt-lower" checked> Lowercase (a-z)</label>
+      <label class="tool-check"><input type="checkbox" id="opt-upper" checked> Uppercase (A-Z)</label>
+      <label class="tool-check"><input type="checkbox" id="opt-numbers" checked> Numbers (0-9)</label>
+      <label class="tool-check"><input type="checkbox" id="opt-symbols"> Symbols (!@#$…)</label>
+    </div>
+
+    <div class="tool-controls">
+      <button class="tool-btn" id="generate-btn">Generate New Password</button>
+    </div>
+
+    <div class="comm-window">
+      <div class="comm-portrait">
+        <svg width="36" height="36" viewBox="0 0 64 64">
+          <circle cx="32" cy="34" r="22" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="44" cy="16" r="8" fill="#1c8a52" stroke="#39ff8f" stroke-width="2"/>
+          <circle cx="20" cy="16" r="3.5" fill="#050b10"/>
+          <circle cx="44" cy="16" r="3.5" fill="#050b10"/>
+          <ellipse cx="24" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <ellipse cx="40" cy="32" rx="4.5" ry="5.5" fill="#050b10"/>
+          <circle cx="24" cy="30" r="1.4" fill="#39ff8f"/>
+          <circle cx="40" cy="30" r="1.4" fill="#39ff8f"/>
+          <path d="M22 42 Q32 48 42 42" stroke="#050b10" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="comm-body">
+        <div class="comm-label"><span class="dot"></span> Incoming Transmission &mdash; Slippy</div>
+        <p>"Turn on all four sets and go long — length beats cleverness every time."</p>
+      </div>
+    </div>
+
+    <a href="https://projects.slippylabs.com/" class="hud-btn">← Back to Archive</a>
+  </div>
+</main>
+
+<script>
+const CHARSETS = {
+  lower: 'abcdefghijklmnopqrstuvwxyz',
+  upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  numbers: '0123456789',
+  symbols: '!@#$%^&*()-_=+[]{};:,.<>?',
+};
+
+const lengthRange = document.getElementById('length-range');
+const lengthValue = document.getElementById('length-value');
+const pwOutput = document.getElementById('pw-output');
+const strengthFill = document.getElementById('strength-fill');
+const strengthLabel = document.getElementById('strength-label');
+const copyToast = document.getElementById('copy-toast');
+
+const checks = {
+  lower: document.getElementById('opt-lower'),
+  upper: document.getElementById('opt-upper'),
+  numbers: document.getElementById('opt-numbers'),
+  symbols: document.getElementById('opt-symbols'),
+};
+
+function activeCharset() {
+  return Object.keys(checks)
+    .filter(key => checks[key].checked)
+    .map(key => CHARSETS[key])
+    .join('');
+}
+
+function randomInt(max) {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0] % max;
+}
+
+function generate() {
+  const pool = activeCharset();
+  const length = Number(lengthRange.value);
+
+  if (!pool) {
+    pwOutput.value = '';
+    strengthLabel.textContent = 'Strength: select at least one character set';
+    strengthFill.style.width = '0%';
+    strengthFill.style.background = 'var(--hud-red)';
+    return;
+  }
+
+  let pw = '';
+  for (let i = 0; i < length; i++) {
+    pw += pool[randomInt(pool.length)];
+  }
+  pwOutput.value = pw;
+  updateStrength(pool.length, length);
+}
+
+function updateStrength(poolSize, length) {
+  const entropyBits = length * Math.log2(poolSize);
+  let pct, label, color;
+  if (entropyBits < 40) { pct = 25; label = 'Weak'; color = 'var(--hud-red)'; }
+  else if (entropyBits < 65) { pct = 55; label = 'Fair'; color = 'var(--hud-orange)'; }
+  else if (entropyBits < 90) { pct = 80; label = 'Strong'; color = 'var(--hud-green-dim)'; }
+  else { pct = 100; label = 'Very Strong'; color = 'var(--hud-green)'; }
+
+  strengthFill.style.width = pct + '%';
+  strengthFill.style.background = color;
+  strengthLabel.textContent = `Strength: ${label} (~${Math.round(entropyBits)} bits of entropy)`;
+}
+
+lengthRange.addEventListener('input', () => {
+  lengthValue.textContent = lengthRange.value;
+  generate();
+});
+Object.values(checks).forEach(box => box.addEventListener('change', generate));
+document.getElementById('generate-btn').addEventListener('click', generate);
+
+document.getElementById('copy-btn').addEventListener('click', async () => {
+  if (!pwOutput.value) return;
+  try {
+    await navigator.clipboard.writeText(pwOutput.value);
+    copyToast.classList.add('show');
+    setTimeout(() => copyToast.classList.remove('show'), 1400);
+  } catch (err) {
+    // Clipboard permission denied — nothing further to do silently.
+  }
+});
+
+generate();
+</script>
+</body>
+</html>
